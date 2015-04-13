@@ -30,14 +30,6 @@ sealed trait Either[+E,+A] {
     // }
     for { a <- this; b1 <- b } yield f(a, b1)
 
-  def map2AccumError[List[E], B, C](b: Either[List[E, B]])(f: (A, B) => C): Either[List[EE, C]] =
-    (this, b) match {
-      case (Right(a), Right(b)) => Right(f(a, b))
-      case (Left(List(e1)), Left(List(e2))) => Left(List(e1, e2))
-      case (Left(e1), _) => Left(e1)
-      case (_, Left(e2)) => Left(e2)
-    }  
-
 }
 case class Left[+E](get: E) extends Either[E,Nothing]
 case class Right[+A](get: A) extends Either[Nothing,A]
@@ -78,5 +70,5 @@ object Person {
     else Right(new Age(age))
 
   def mkPerson(name: String, age: Int): Either[List[String], Person] =
-    mkName(name).map2AccumError(mkAge(age))(Person(_, _))  
+    mkName(name).map2(mkAge(age))(Person(_, _))  
 }
